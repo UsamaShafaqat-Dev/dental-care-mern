@@ -32,7 +32,7 @@ const Home = () => {
     const loadingToast = toast.loading("Sending your message...");
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/contact/submit",
+        "https://dental-care-mern.onrender.com/api/contact/submit",
         inquiryData,
       );
       if (res.data.success) {
@@ -49,7 +49,7 @@ const Home = () => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/services");
+        const res = await axios.get("https://dental-care-mern.onrender.com/api/services");
         if (res.data.success) {
           setServices(res.data.data.slice(0, 8));
         }

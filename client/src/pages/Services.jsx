@@ -23,7 +23,7 @@ const Services = () => {
 
   const fetchServices = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/services");
+      const res = await axios.get("https://dental-care-mern.onrender.com/api/services");
       if (res.data.success) setServices(res.data.data);
       setLoading(false);
     } catch (error) {
@@ -65,14 +65,14 @@ const Services = () => {
       if (isEditing) {
         // Edit Mode
         response = await axios.put(
-          `http://localhost:5000/api/services/${currentId}`,
+          `https://dental-care-mern.onrender.com/api/services/${currentId}`,
           data,
           config
         );
       } else {
         // Add Mode
         response = await axios.post(
-          "http://localhost:5000/api/services/add",
+          "https://dental-care-mern.onrender.com/api/services/add",
           data,
           config
         );
@@ -96,7 +96,7 @@ const Services = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Kya aap waqayi ye service khatam karna chahte hain?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/services/${id}`, {
+        await axios.delete(`https://dental-care-mern.onrender.com/api/services/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         toast.success("Service deleted!");

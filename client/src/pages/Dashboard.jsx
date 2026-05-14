@@ -33,8 +33,8 @@ const Dashboard = () => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const [appRes, msgRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/appointments/all", config),
-        axios.get("http://localhost:5000/api/contact/all", config),
+        axios.get("https://dental-care-mern.onrender.com/api/appointments/all", config),
+        axios.get("https://dental-care-mern.onrender.com/api/contact/all", config),
       ]);
       if (appRes.data.success) setAppointments(appRes.data.data);
       if (msgRes.data.success) setMessages(msgRes.data.data);
@@ -71,7 +71,7 @@ const Dashboard = () => {
   const handleStatusUpdate = async (id, newStatus) => {
     try {
       await axios.put(
-        `http://localhost:5000/api/appointments/status/${id}`,
+        `https://dental-care-mern.onrender.com/api/appointments/status/${id}`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -86,7 +86,7 @@ const Dashboard = () => {
     if (window.confirm("Delete this appointment?")) {
       try {
         await axios.delete(
-          `http://localhost:5000/api/appointments/delete/${id}`,
+          `https://dental-care-mern.onrender.com/api/appointments/delete/${id}`,
           { headers: { Authorization: `Bearer ${token}` } },
         );
         toast.success("Deleted!");
@@ -100,7 +100,7 @@ const Dashboard = () => {
   const handleMessageStatus = async (id, newStatus) => {
     try {
       await axios.put(
-        `http://localhost:5000/api/contact/status/${id}`,
+        `https://dental-care-mern.onrender.com/api/contact/status/${id}`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -113,7 +113,7 @@ const Dashboard = () => {
   const handleMessageDelete = async (id) => {
     if (window.confirm("Delete message?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/contact/delete/${id}`, {
+        await axios.delete(`https://dental-care-mern.onrender.com/api/contact/delete/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         fetchData();
