@@ -1,8 +1,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { MapPin, Phone, Mail, MessageCircle, Globe } from "lucide-react";
+import { MapPin, Phone, Mail, MessageCircle, Globe, Lock } from "lucide-react";
 
 const Footer = () => {
+  // Aapka number add kar diya gaya hai (baghair + ke)
+  const myWhatsAppNumber = "923053820963";
+
+  // Yeh wo pre-filled message hai jo client ki taraf se aayega
+  const waMessage =
+    "Hi USAMA MERN-STACK! I saw your work on Dr. Umair's clinic website and I am interested in getting a professional website developed. Can we discuss the details?";
+
+  const waLink = `https://wa.me/${myWhatsAppNumber}?text=${encodeURIComponent(waMessage)}`;
+
   return (
     <footer className="bg-blue-50 pt-20 pb-10 border-t border-blue-100/50">
       <div className="max-w-7xl mx-auto px-6">
@@ -96,12 +105,16 @@ const Footer = () => {
               </a>
               <a
                 href="https://www.facebook.com/share/17jLNRi6rj/"
+                target="_blank"
+                rel="noreferrer"
                 className="w-10 h-10 rounded-full bg-white border border-blue-100 flex items-center justify-center text-blue-600 hover:bg-blue-600 hover:text-white transition-all font-bold shadow-sm"
               >
                 f
               </a>
               <a
                 href="https://www.instagram.com/dr.umair_rafique?igsh=MWxleDkzNWo0OG1vbw=="
+                target="_blank"
+                rel="noreferrer"
                 className="w-10 h-10 rounded-full bg-white border border-blue-100 flex items-center justify-center text-pink-600 hover:bg-pink-600 hover:text-white transition-all font-bold shadow-sm text-sm"
               >
                 ig
@@ -119,7 +132,28 @@ const Footer = () => {
         {/* Bottom Bar Centered */}
         <div className="pt-12 mt-12 border-t border-blue-100 flex flex-col items-center gap-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">
           <p>© 2026 DR. UMAIR RAFIQUE DENTAL CLINIC. ALL RIGHTS RESERVED.</p>
-          <p className="text-blue-600/50">Developed by USAMA MERN-STACK</p>
+          <div className="flex items-center gap-3">
+            <p className="text-blue-600/50">
+              Developed by {/* WhatsApp Link applied here */}
+              <a
+                href={waLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600/70 hover:text-blue-600 hover:underline transition-all cursor-pointer"
+                title="Contact the Developer"
+              >
+                USAMA MERN-STACK
+              </a>
+            </p>
+            {/* Secret Admin Login Icon */}
+            <Link
+              to="/login"
+              className="text-blue-600/30 hover:text-blue-600 transition-all"
+              title="Admin Access"
+            >
+              <Lock size={12} />
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

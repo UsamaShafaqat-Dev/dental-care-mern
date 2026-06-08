@@ -26,6 +26,13 @@ const Dashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
 
+  // Custom Modal State Add Ki Hai
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    type: "",
+    id: null,
+  });
+
   const navigate = useNavigate();
   const token = localStorage.getItem("adminToken");
 
@@ -33,8 +40,14 @@ const Dashboard = () => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const [appRes, msgRes] = await Promise.all([
-        axios.get("https://dental-care-mern.onrender.com/api/appointments/all", config),
-        axios.get("https://dental-care-mern.onrender.com/api/contact/all", config),
+        axios.get(
+          "https://dental-care-mern.onrender.com/api/appointments/all",
+          config,
+        ),
+        axios.get(
+          "https://dental-care-mern.onrender.com/api/contact/all",
+          config,
+        ),
       ]);
       if (appRes.data.success) setAppointments(appRes.data.data);
       if (msgRes.data.success) setMessages(msgRes.data.data);
@@ -82,18 +95,17 @@ const Dashboard = () => {
     }
   };
 
+  // Window.confirm hata diya hai
   const handleDelete = async (id) => {
-    if (window.confirm("Delete this appointment?")) {
-      try {
-        await axios.delete(
-          `https://dental-care-mern.onrender.com/api/appointments/delete/${id}`,
-          { headers: { Authorization: `Bearer ${token}` } },
-        );
-        toast.success("Deleted!");
-        fetchData();
-      } catch (error) {
-        toast.error("Delete failed.");
-      }
+    try {
+      await axios.delete(
+        `https://dental-care-mern.onrender.com/api/appointments/delete/${id}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      toast.success("Deleted!");
+      fetchData();
+    } catch (error) {
+      toast.error("Delete failed.");
     }
   };
 
@@ -110,17 +122,29 @@ const Dashboard = () => {
     }
   };
 
+  // Window.confirm hata diya hai
   const handleMessageDelete = async (id) => {
-    if (window.confirm("Delete message?")) {
-      try {
-        await axios.delete(`https://dental-care-mern.onrender.com/api/contact/delete/${id}`, {
+    try {
+      await axios.delete(
+        `https://dental-care-mern.onrender.com/api/contact/delete/${id}`,
+        {
           headers: { Authorization: `Bearer ${token}` },
-        });
-        fetchData();
-      } catch (error) {
-        toast.error("Delete failed.");
-      }
+        },
+      );
+      fetchData();
+    } catch (error) {
+      toast.error("Delete failed.");
     }
+  };
+
+  // Naya function custom modal se delete execute karne ke liye
+  const confirmDelete = async () => {
+    if (deleteModal.type === "appointment") {
+      await handleDelete(deleteModal.id);
+    } else {
+      await handleMessageDelete(deleteModal.id);
+    }
+    setDeleteModal({ isOpen: false, type: "", id: null });
   };
 
   const handleLogout = () => {
@@ -144,7 +168,7 @@ const Dashboard = () => {
     );
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 md:px-8">
+    <div className="min-h-screen bg-gray-50 py-12 px-4 md:px-8 relative">
       <div className="max-w-7xl mx-auto">
         {/* HEADER */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
@@ -341,7 +365,16 @@ const Dashboard = () => {
                         </select>
                       </td>
                       <td className="px-8 py-6 text-center text-gray-300 hover:text-red-500 transition-colors">
-                        <button onClick={() => handleDelete(app._id)}>
+                        {/* Custom Modal Trigger */}
+                        <button
+                          onClick={() =>
+                            setDeleteModal({
+                              isOpen: true,
+                              type: "appointment",
+                              id: app._id,
+                            })
+                          }
+                        >
                           <Trash2 size={18} />
                         </button>
                       </td>
@@ -379,17 +412,33 @@ const Dashboard = () => {
                   <p className="text-xs text-gray-400 mb-4 font-bold italic">
                     {app.phoneNumber}
                   </p>
-                  <select
-                    value={app.status}
-                    onChange={(e) =>
-                      handleStatusUpdate(app._id, e.target.value)
-                    }
-                    className="w-full p-3 rounded-2xl bg-gray-50 border-none text-[10px] font-black uppercase tracking-widest shadow-sm"
-                  >
-                    <option value="Pending">Pending</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Cancelled">Cancelled</option>
-                  </select>
+
+                  {/* Mobile View Mein Delete Button Add Kiya Hai */}
+                  <div className="flex gap-2 items-center">
+                    <select
+                      value={app.status}
+                      onChange={(e) =>
+                        handleStatusUpdate(app._id, e.target.value)
+                      }
+                      className="w-full p-3 rounded-2xl bg-gray-50 border-none text-[10px] font-black uppercase tracking-widest shadow-sm"
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Cancelled">Cancelled</option>
+                    </select>
+                    <button
+                      onClick={() =>
+                        setDeleteModal({
+                          isOpen: true,
+                          type: "appointment",
+                          id: app._id,
+                        })
+                      }
+                      className="p-3 bg-red-50 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all flex-shrink-0"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -431,8 +480,15 @@ const Dashboard = () => {
                   >
                     {msg.status === "Read" ? "Read" : "Mark as Read"}
                   </button>
+                  {/* Custom Modal Trigger */}
                   <button
-                    onClick={() => handleMessageDelete(msg._id)}
+                    onClick={() =>
+                      setDeleteModal({
+                        isOpen: true,
+                        type: "message",
+                        id: msg._id,
+                      })
+                    }
                     className="p-4 bg-red-50 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all"
                   >
                     <Trash2 size={16} />
@@ -443,6 +499,40 @@ const Dashboard = () => {
           </div>
         )}
       </div>
+
+      {/* --- KHOOBSURAT CUSTOM DELETE MODAL --- */}
+      {deleteModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-blue-950/40 backdrop-blur-sm px-4">
+          <div className="bg-white rounded-[35px] p-8 max-w-sm w-full shadow-2xl transform transition-all text-center border border-gray-100">
+            <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertCircle size={40} />
+            </div>
+            <h3 className="text-2xl font-black text-blue-950 mb-2">
+              Are you sure?
+            </h3>
+            <p className="text-gray-500 text-sm font-medium mb-8">
+              Do you really want to delete this {deleteModal.type}? This action
+              cannot be undone.
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={() =>
+                  setDeleteModal({ isOpen: false, type: "", id: null })
+                }
+                className="flex-1 py-4 bg-gray-100 text-gray-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-200 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="flex-1 py-4 bg-red-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-red-600 transition-all shadow-md shadow-red-500/30"
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

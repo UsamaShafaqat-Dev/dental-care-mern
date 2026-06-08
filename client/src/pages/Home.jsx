@@ -2,7 +2,7 @@ import doctorPic from "../assets/dr-umair.jpg";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import toast from "react-hot-toast"; // Naya Import
+import toast from "react-hot-toast";
 import {
   CheckCircle,
   Star,
@@ -11,8 +11,8 @@ import {
   Sparkles,
   Microscope,
   ArrowRight,
-  Send, // Naya Icon
-  MessageSquare, // Naya Icon
+  Send,
+  MessageSquare,
 } from "lucide-react";
 
 const Home = () => {
@@ -49,7 +49,9 @@ const Home = () => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const res = await axios.get("https://dental-care-mern.onrender.com/api/services");
+        const res = await axios.get(
+          "https://dental-care-mern.onrender.com/api/services",
+        );
         if (res.data.success) {
           setServices(res.data.data.slice(0, 8));
         }
@@ -127,8 +129,8 @@ const Home = () => {
             </h3>
 
             <p className="text-gray-600 text-lg leading-relaxed font-medium">
-              With over 5 years of experience in clinical dentistry, Dr. Umair Rafique
-              provides comprehensive dental solutions. We specialize in
+              With over 5 years of experience in clinical dentistry, Dr. Umair
+              Rafique provides comprehensive dental solutions. We specialize in
               aesthetic dentistry and painless procedures to ensure you leave
               with a confident smile.
             </p>
@@ -386,7 +388,8 @@ const Home = () => {
       </section>
 
       {/* --- 8. QUICK INQUIRY SECTION (Footer se pehle) --- */}
-      <section className="py-24 px-6 bg-white">
+      {/* Yahan id="contact" aur scroll-mt-20 add kiya gaya hai */}
+      <section id="contact" className="py-24 px-6 bg-white scroll-mt-20">
         <div className="max-w-7xl mx-auto">
           <div className="bg-blue-600 rounded-[60px] p-10 md:p-20 overflow-hidden relative shadow-2xl shadow-blue-200">
             {/* Background Decoration */}

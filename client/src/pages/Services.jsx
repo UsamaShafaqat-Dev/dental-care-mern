@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { Plus, Edit2, Trash2, X, Upload, Link as LinkIcon } from "lucide-react";
+// AlertCircle icon ko import mein add kiya hai
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  X,
+  Upload,
+  Link as LinkIcon,
+  AlertCircle,
+} from "lucide-react";
 
 const Services = () => {
   const [services, setServices] = useState([]);
@@ -11,6 +20,9 @@ const Services = () => {
   const [currentId, setCurrentId] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [useUrl, setUseUrl] = useState(false);
+
+  // Custom Delete Modal ke liye nayi state
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null });
 
   const token = localStorage.getItem("adminToken");
   const isAdmin = !!token;
@@ -23,7 +35,9 @@ const Services = () => {
 
   const fetchServices = async () => {
     try {
-      const res = await axios.get("https://dental-care-mern.onrender.com/api/services");
+      const res = await axios.get(
+        "https://dental-care-mern.onrender.com/api/services",
+      );
       if (res.data.success) setServices(res.data.data);
       setLoading(false);
     } catch (error) {
@@ -67,44 +81,50 @@ const Services = () => {
         response = await axios.put(
           `https://dental-care-mern.onrender.com/api/services/${currentId}`,
           data,
-          config
+          config,
         );
       } else {
         // Add Mode
         response = await axios.post(
           "https://dental-care-mern.onrender.com/api/services/add",
           data,
-          config
+          config,
         );
       }
 
       if (response.data.success) {
-        toast.success(isEditing ? "Service updated! ✨" : "Service added! ✨", { id: loadingToast });
+        toast.success(isEditing ? "Service updated! ✨" : "Service added! ✨", {
+          id: loadingToast,
+        });
         closeModal();
         fetchServices();
       } else {
         toast.error("Process failed on server.", { id: loadingToast });
       }
-
     } catch (error) {
       console.error("Error details:", error.response?.data);
-      toast.error(error.response?.data?.message || "Something went wrong.", { id: loadingToast });
+      toast.error(error.response?.data?.message || "Something went wrong.", {
+        id: loadingToast,
+      });
     }
   };
 
-  // --- 2. HANDLE DELETE ---
-  const handleDelete = async (id) => {
-    if (window.confirm("Kya aap waqayi ye service khatam karna chahte hain?")) {
-      try {
-        await axios.delete(`https://dental-care-mern.onrender.com/api/services/${id}`, {
+  // --- 2. HANDLE DELETE (Updated for Custom Modal) ---
+  const confirmDelete = async () => {
+    try {
+      await axios.delete(
+        `https://dental-care-mern.onrender.com/api/services/${deleteModal.id}`,
+        {
           headers: { Authorization: `Bearer ${token}` },
-        });
-        toast.success("Service deleted!");
-        fetchServices();
-      } catch (error) {
-        toast.error("Delete nahi ho saka.");
-      }
+        },
+      );
+      toast.success("Service deleted!");
+      fetchServices();
+    } catch (error) {
+      toast.error("Delete nahi ho saka.");
     }
+    // Delete hone ke baad modal close kar do
+    setDeleteModal({ isOpen: false, id: null });
   };
 
   // --- 3. OPEN EDIT MODAL ---
@@ -116,7 +136,7 @@ const Services = () => {
     });
     setCurrentId(service._id);
     setIsEditing(true);
-    setUseUrl(true); 
+    setUseUrl(true);
     setShowModal(true);
   };
 
@@ -128,10 +148,15 @@ const Services = () => {
     setImageFile(null);
   };
 
-  if (loading) return <div className="text-center py-20 font-black text-blue-900">Loading Services...</div>;
+  if (loading)
+    return (
+      <div className="text-center py-20 font-black text-blue-900">
+        Loading Services...
+      </div>
+    );
 
   return (
-    <div className="bg-white py-24 px-6">
+    <div className="bg-white py-24 px-6 relative">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-16">
           <h2 className="text-5xl font-black text-blue-950 tracking-tighter">
@@ -164,8 +189,11 @@ const Services = () => {
                   >
                     <Edit2 size={16} />
                   </button>
+                  {/* Custom Modal ko trigger karne wala button */}
                   <button
-                    onClick={() => handleDelete(service._id)}
+                    onClick={() =>
+                      setDeleteModal({ isOpen: true, id: service._id })
+                    }
                     className="p-3 bg-white/90 backdrop-blur rounded-2xl text-red-500 shadow-lg hover:bg-red-500 hover:text-white transition-all"
                   >
                     <Trash2 size={16} />
@@ -193,7 +221,7 @@ const Services = () => {
         </div>
       </div>
 
-      {/* --- MODAL --- */}
+      {/* --- ADD/EDIT MODAL --- */}
       {showModal && (
         <div className="fixed inset-0 bg-blue-950/20 backdrop-blur-md flex items-center justify-center z-50 p-4">
           <div className="bg-white w-full max-w-lg rounded-[50px] p-10 shadow-2xl relative">
@@ -279,6 +307,38 @@ const Services = () => {
                 {isEditing ? "Update Service" : "Publish Service"}
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* --- KHOOBSURAT CUSTOM DELETE MODAL --- */}
+      {deleteModal.isOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-blue-950/40 backdrop-blur-sm px-4">
+          <div className="bg-white rounded-[35px] p-8 max-w-sm w-full shadow-2xl transform transition-all text-center border border-gray-100">
+            <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertCircle size={40} />
+            </div>
+            <h3 className="text-2xl font-black text-blue-950 mb-2">
+              Are you sure?
+            </h3>
+            <p className="text-gray-500 text-sm font-medium mb-8">
+              Do you really want to delete this service? This action cannot be
+              undone.
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setDeleteModal({ isOpen: false, id: null })}
+                className="flex-1 py-4 bg-gray-100 text-gray-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-200 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="flex-1 py-4 bg-red-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-red-600 transition-all shadow-md shadow-red-500/30"
+              >
+                Yes, Delete
+              </button>
+            </div>
           </div>
         </div>
       )}
