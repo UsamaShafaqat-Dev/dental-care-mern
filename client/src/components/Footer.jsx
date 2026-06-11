@@ -145,14 +145,6 @@ const Footer = () => {
                 USAMA MERN-STACK
               </a>
             </p>
-            {/* Secret Admin Login Icon */}
-            <Link
-              to="/login"
-              className="text-blue-600/30 hover:text-blue-600 transition-all"
-              title="Admin Access"
-            >
-              <Lock size={12} />
-            </Link>
           </div>
         </div>
       </div>

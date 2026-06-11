@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, LogOut, LayoutDashboard, CalendarCheck } from "lucide-react";
+import {
+  Menu,
+  X,
+  LogOut,
+  LayoutDashboard,
+  CalendarCheck,
+  Lock,
+} from "lucide-react"; // <-- Lock icon add kiya hai
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,7 +40,6 @@ const Navbar = () => {
       setTimeout(() => {
         const el = document.getElementById("contact");
         if (el) {
-          // Navbar ke neechay chupne se bachanay ke liye exact offset
           const navbarHeight = 80;
           const elementPosition = el.getBoundingClientRect().top;
           const offsetPosition =
@@ -49,23 +55,18 @@ const Navbar = () => {
   // --- 2. 100% ACCURATE ACTIVE LINK CHECKER ---
   const checkIsActive = (path) => {
     if (path === "/") {
-      // Home sirf tab active ho jab path "/" ho AUR uske agay "#contact" NA ho
       return location.pathname === "/" && !location.hash;
     }
     if (path === "/#contact") {
-      // Contact tab active ho jab path "/" ho AUR hash "#contact" ho
       return location.pathname === "/" && location.hash === "#contact";
     }
     return location.pathname === path;
   };
 
-  // --- 3. CLICK HANDLER (MASLA YAHAN HAL HUA HAI) ---
+  // --- 3. CLICK HANDLER ---
   const handleLinkClick = (e, path) => {
     e.preventDefault();
     setIsOpen(false);
-
-    // Ab hum manually state nahi chher rahe, React Router (navigate) ko bata rahe hain
-    // Is se active class foran update ho jayegi!
     navigate(path);
   };
 
@@ -110,30 +111,55 @@ const Navbar = () => {
                   >
                     {link.name}
                     <span
-                      className={`absolute -bottom-1.5 w-1 h-1 bg-blue-600 rounded-full transition-transform duration-300 ${isActive ? "scale-100" : "scale-0"}`}
+                      className={`absolute -bottom-1.5 w-1 h-1 bg-blue-600 rounded-full transition-transform duration-300 ${
+                        isActive ? "scale-100" : "scale-0"
+                      }`}
                     ></span>
                   </Link>
                 );
               })}
 
-              {/* Dashboard Link */}
+              {/* Dashboard Link (If Logged In) */}
               {isLoggedIn && (
                 <Link
                   to="/dashboard"
                   onClick={(e) => handleLinkClick(e, "/dashboard")}
-                  className={`relative text-sm font-bold transition-all duration-300 flex flex-col items-center group ${location.pathname === "/dashboard" ? "text-blue-600" : "text-gray-500 hover:text-blue-400"}`}
+                  className={`relative text-sm font-bold transition-all duration-300 flex flex-col items-center group ${
+                    location.pathname === "/dashboard"
+                      ? "text-blue-600"
+                      : "text-gray-500 hover:text-blue-400"
+                  }`}
                 >
                   <div className="flex items-center gap-2">
                     <LayoutDashboard size={14} /> Dashboard
                   </div>
                   <span
-                    className={`absolute -bottom-1.5 w-1 h-1 bg-blue-600 rounded-full transition-transform duration-300 ${location.pathname === "/dashboard" ? "scale-100" : "scale-0"}`}
+                    className={`absolute -bottom-1.5 w-1 h-1 bg-blue-600 rounded-full transition-transform duration-300 ${
+                      location.pathname === "/dashboard"
+                        ? "scale-100"
+                        : "scale-0"
+                    }`}
                   ></span>
                 </Link>
               )}
             </div>
 
             <div className="flex items-center gap-3">
+              {/* Admin Button for Desktop (Sirf tab show hoga agar login nahi hai) */}
+              {!isLoggedIn && (
+                <Link
+                  to="/login"
+                  onClick={(e) => handleLinkClick(e, "/login")}
+                  className="flex items-center gap-1.5 text-gray-400 hover:text-blue-600 transition-all px-3 py-2 rounded-xl hover:bg-blue-50"
+                  title="Admin Access"
+                >
+                  <Lock size={14} />
+                  <span className="text-xs font-bold uppercase tracking-widest">
+                    Admin
+                  </span>
+                </Link>
+              )}
+
               <Link
                 to="/appointment"
                 onClick={(e) => handleLinkClick(e, "/appointment")}
@@ -174,7 +200,9 @@ const Navbar = () => {
                 key={link.name}
                 to={link.path}
                 onClick={(e) => handleLinkClick(e, link.path)}
-                className={`block text-lg font-bold ${isActive ? "text-blue-600" : "text-gray-700"}`}
+                className={`block text-lg font-bold ${
+                  isActive ? "text-blue-600" : "text-gray-700"
+                }`}
               >
                 {link.name}
               </Link>
@@ -184,11 +212,16 @@ const Navbar = () => {
             <Link
               to="/dashboard"
               onClick={(e) => handleLinkClick(e, "/dashboard")}
-              className={`block text-lg font-bold ${location.pathname === "/dashboard" ? "text-blue-600" : "text-gray-700"}`}
+              className={`block text-lg font-bold ${
+                location.pathname === "/dashboard"
+                  ? "text-blue-600"
+                  : "text-gray-700"
+              }`}
             >
               Dashboard
             </Link>
           )}
+
           <div className="pt-4 flex flex-col gap-3">
             <Link
               to="/appointment"
@@ -197,6 +230,18 @@ const Navbar = () => {
             >
               Book Appointment
             </Link>
+
+            {/* Admin Login Button for Mobile */}
+            {!isLoggedIn && (
+              <Link
+                to="/login"
+                onClick={(e) => handleLinkClick(e, "/login")}
+                className="w-full bg-gray-50 text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors py-4 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2"
+              >
+                <Lock size={16} /> Admin Login
+              </Link>
+            )}
+
             {isLoggedIn && (
               <button
                 onClick={handleLogout}
